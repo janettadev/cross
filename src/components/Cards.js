@@ -4,11 +4,10 @@ import AddIcon from "@mui/icons-material/Add";
 import { useDispatch } from "react-redux";
 import { addToBasket} from "../redux/cross/crossSlice";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import CheckIcon from '@mui/icons-material/Check';
 
 const Cards = ({ el }) => {
 	const dispatch = useDispatch();
-	function handleAddToBasket(e) {
+	function handleAddToBasket() {
 		return dispatch(addToBasket(el));
 	}
 	return (

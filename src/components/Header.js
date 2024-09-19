@@ -8,7 +8,7 @@ import {
 	Toolbar,
 	Typography,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import logo from "../img/image 4.png";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -27,21 +27,19 @@ const Header = () => {
 	const dispatch = useDispatch();
 	const basket = useSelector((state) => state.cross.basket || []);
 
-	useEffect(() => {
-		dispatch(fetchBasket());
+	const deleteBasket = useCallback((itemId) => {
+		dispatch(deleteFromBasket(itemId));
 	}, [dispatch]);
-
-
-	function deleteBasket(itemId) {
-		return dispatch(deleteFromBasket(itemId));
-	}
 
 	const arr = basket
 		.map((el) => el.price)
 		.map((value) => parseFloat(value.replace("€", "")));
-	const price = arr.reduce((acc, curr) => acc + curr, 0).toPrecision(4);
+	const price = arr.reduce((acc, curr) => acc + curr, 0).toFixed(2);
 	const percent = (price * 5) / 100;
 
+	useEffect(() => {
+		dispatch(fetchBasket());
+	}, [dispatch]);
 	return (
 		<Box>
 			<AppBar sx={{ background: "#fff", padding: "15px" }}>
@@ -262,7 +260,7 @@ const Header = () => {
 												fontSize: "16px",
 												fontWeight: "600",
 											}}>
-											€{percent}
+											€{percent.toFixed(2)}
 										</span>
 									</Typography>
 									<Button

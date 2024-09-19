@@ -1,31 +1,40 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { API_BASKET, API_CROSS, API_MARK } from "../../const";
+import { API_BASKET, API_CROSS } from "../../const"; 
 
 export const fetchCross = createAsyncThunk("cross/fetchCross", async () => {
-	const response = await axios.get("http://localhost:3000/cross");
+	const response = await axios.get(API_CROSS);
 	return response.data;
 });
 
 export const fetchBasket = createAsyncThunk("cross/fetchBasket", async () => {
-	const res = await axios.get(API_BASKET);
-	return res.data;
+	const response = await axios.get(API_BASKET);
+	return response.data;
 });
+
 export const addToBasket = createAsyncThunk(
 	"cross/addToBasket",
-	async (item) => {
-		const response = await axios.post("http://localhost:3000/basket", item);
-		return response.data;
-	}
-);
-export const deleteFromBasket = createAsyncThunk(
-	"cross/deleteFromBasket",
-	async (itemId) => {
-		await axios.delete(`${API_BASKET}/${itemId}`);
-		return itemId;
+	async (item, { rejectWithValue }) => {
+		try {
+			const response = await axios.post(API_BASKET, item);
+			return response.data;
+		} catch (error) {
+			return rejectWithValue(error.response.data); 
+		}
 	}
 );
 
+export const deleteFromBasket = createAsyncThunk(
+	"cross/deleteFromBasket",
+	async (itemId, { rejectWithValue }) => {
+		try {
+			await axios.delete(`${API_BASKET}/${itemId}`);
+			return itemId;
+		} catch (error) {
+			return rejectWithValue(error.response.data); 
+		}
+	}
+);
 
 const crossSlice = createSlice({
 	name: "cross",
@@ -60,7 +69,7 @@ const crossSlice = createSlice({
 			})
 			.addCase(addToBasket.rejected, (state, action) => {
 				state.loading = false;
-				state.error = action.error.message;
+				state.error = action.payload || action.error.message;
 			})
 			// Fetch Basket
 			.addCase(fetchBasket.pending, (state) => {
@@ -88,8 +97,9 @@ const crossSlice = createSlice({
 			})
 			.addCase(deleteFromBasket.rejected, (state, action) => {
 				state.loading = false;
-				state.error = action.error.message;
+				state.error = action.payload || action.error.message;
 			});
 	},
 });
+
 export default crossSlice.reducer;
